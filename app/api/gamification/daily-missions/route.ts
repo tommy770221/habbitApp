@@ -72,6 +72,9 @@ export async function POST(request: Request) {
     p_description: "每日任務完成獎勵",
   })
 
+  // Add battle energy (+5 per daily mission)
+  await supabase.rpc("add_battle_energy", { p_user_id: user.id, p_amount: 5 })
+
   // Check badge eligibility
   const { awarded: badges, xp_total: badge_xp } = await checkAndAwardBadges(supabase, user.id)
 

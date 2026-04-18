@@ -285,6 +285,58 @@ export interface UserMission {
   progress_percent: number // computed
 }
 
+// ─── RPG Game ─────────────────────────────────────────────────────
+
+export interface GameCharacter {
+  id: string
+  slug: string
+  name: string
+  description: string
+  icon: string
+  habit_type: string | null
+  base_attack: number
+  base_defense: number
+  base_hp: number
+  skill_name: string
+  skill_desc: string
+  skill_cost: number
+  unlock_count: number
+  sort_order: number
+}
+
+export interface Monster {
+  id: string
+  slug: string
+  name: string
+  description: string
+  icon: string
+  max_hp: number
+  attack_power: number
+  stage_level: number
+  xp_reward: number
+  energy_reward: number
+}
+
+export interface UserGameState {
+  user_id: string
+  battle_energy: number
+  current_stage: number
+  total_monsters_defeated: number
+}
+
+export interface UserCharacter {
+  id: string
+  user_id: string
+  character_id: string
+  character: GameCharacter
+  unlock_progress: number
+  is_unlocked: boolean
+  is_active: boolean
+  unlocked_at: string | null
+}
+
+export type BattleResult = "victory" | "defeat" | "fled"
+
 // ─── Badges ───────────────────────────────────────────────────────
 
 export type BadgeCategory =

@@ -117,6 +117,33 @@ export async function POST(request: Request) {
     p_description: habitLabels[habit_type],
   })
 
+  // Add battle energy (+10 per habit checkin)
+  await supabase.rpc("add_battle_energy", { p_user_id: user.id, p_amount: 10 })
+
+  // Update unlock progress for the habit-linked character
+  const { data: habitChar } = await supabase
+    .from("game_characters")
+    .select("id, unlock_count")
+    .eq("habit_type", habit_type)
+    .maybeSingle()
+  if (habitChar) {
+    const { data: uc } = await supabase
+      .from("user_characters")
+      .select("id, unlock_progress, is_unlocked")
+      .eq("user_id", user.id)
+      .eq("character_id", habitChar.id)
+      .maybeSingle()
+    if (uc && !uc.is_unlocked) {
+      const newProgress = uc.unlock_progress + 1
+      const nowUnlocked = newProgress >= habitChar.unlock_count
+      await supabase.from("user_characters").update({
+        unlock_progress: newProgress,
+        is_unlocked: nowUnlocked,
+        unlocked_at: nowUnlocked ? new Date().toISOString() : null,
+      }).eq("id", uc.id)
+    }
+  }
+
   const { awarded: badges, xp_total: badge_xp } = await checkAndAwardBadges(supabase, user.id)
 
   return NextResponse.json({

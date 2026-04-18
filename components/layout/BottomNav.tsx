@@ -8,7 +8,7 @@ import {
   Activity,
   CheckSquare,
   Target,
-  Trophy,
+  Swords,
   User,
 } from "lucide-react"
 
@@ -17,7 +17,7 @@ const navItems = [
   { href: "/metrics", label: "數據", icon: Activity },
   { href: "/habits", label: "打卡", icon: CheckSquare },
   { href: "/missions", label: "任務", icon: Target },
-  { href: "/achievements", label: "成就", icon: Trophy },
+  { href: "/game", label: "遊戲", icon: Swords },
   { href: "/profile", label: "我的", icon: User },
 ]
 

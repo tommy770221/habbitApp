@@ -70,6 +70,9 @@ export async function POST(request: Request) {
     p_description: metricLabels[metric_type],
   })
 
+  // Add battle energy (+10 per metric record)
+  await supabase.rpc("add_battle_energy", { p_user_id: user.id, p_amount: 10 })
+
   const { awarded: badges, xp_total: badge_xp } = await checkAndAwardBadges(supabase, user.id)
 
   return NextResponse.json({
