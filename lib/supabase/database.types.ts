@@ -104,7 +104,7 @@ type MissionTemplateRow = {
   id: string
   title: string
   description: string
-  mission_type: "weekly" | "monthly" | "special"
+  mission_type: "daily" | "weekly" | "monthly" | "special"
   category: string
   target_count: number
   xp_reward: number

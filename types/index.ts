@@ -212,7 +212,7 @@ export type XPSourceType =
 
 // ─── Missions ─────────────────────────────────────────────────────
 
-export type MissionType = "weekly" | "monthly" | "special"
+export type MissionType = "daily" | "weekly" | "monthly" | "special"
 export type MissionCategory =
   | "metrics"
   | "diet"
@@ -244,6 +244,29 @@ export interface MissionCondition {
   operator?: ">=" | "<=" | "==" | "range"
   range?: [number, number]
   sub_conditions?: MissionCondition[]
+}
+
+export interface DailyFormField {
+  key: string
+  label: string
+  placeholder: string
+}
+
+export interface DailyFormCondition {
+  type: "daily_form"
+  habit_direction: "positive" | "negative"
+  pattern: "commitment" | "craving" | "friction"
+  template: string
+  example: string
+  fields: DailyFormField[]
+}
+
+export interface DailyMissionResponse {
+  id: string
+  user_id: string
+  user_mission_id: string
+  response_json: Record<string, string>
+  created_at: string
 }
 
 export interface UserMission {
