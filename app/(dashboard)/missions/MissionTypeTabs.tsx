@@ -6,6 +6,7 @@ const TABS = [
   { key: "daily",   label: "每日任務" },
   { key: "weekly",  label: "每週任務" },
   { key: "monthly", label: "每月任務" },
+  { key: "history", label: "回顧" },
 ] as const
 
 type TabKey = typeof TABS[number]["key"]
