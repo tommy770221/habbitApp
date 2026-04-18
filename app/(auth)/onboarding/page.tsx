@@ -13,7 +13,6 @@ export default async function OnboardingPage() {
     .eq("id", user.id)
     .single()
 
-  if (profile?.onboarding_completed) redirect("/")
 
   return <OnboardingClient />
 }

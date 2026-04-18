@@ -7,7 +7,7 @@ import { Badge } from "@/components/ui/badge"
 import { XPProgressBar } from "@/components/gamification/XPProgressBar"
 import { StreakCounter } from "@/components/gamification/StreakCounter"
 import { toLocaleDateString } from "@/lib/utils"
-import { Activity, CheckSquare, Pill, Plus, ChevronRight } from "lucide-react"
+import { Activity, CheckSquare, Pill, Plus, ChevronRight, BookOpen } from "lucide-react"
 import type { HealthMetric } from "@/types"
 
 export default async function DashboardPage() {
@@ -79,6 +79,22 @@ export default async function DashboardPage() {
 
   return (
     <div className="space-y-5 p-4">
+      {/* Tutorial link */}
+      <Link href="/onboarding">
+        <Card className="border-green-200 bg-green-50 hover:border-green-400 transition-colors cursor-pointer">
+          <CardContent className="py-3 px-4 flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <BookOpen className="w-5 h-5 text-green-600" />
+              <div>
+                <p className="font-medium text-gray-900 text-sm">功能使用教學</p>
+                <p className="text-xs text-gray-500">重新瀏覽 App 功能介紹</p>
+              </div>
+            </div>
+            <ChevronRight className="w-4 h-4 text-gray-400" />
+          </CardContent>
+        </Card>
+      </Link>
+
       {/* Today XP earned */}
       {todayXP > 0 && (
         <div className="bg-gradient-to-r from-green-500 to-teal-500 rounded-2xl p-4 text-white">
