@@ -28,6 +28,10 @@ export default async function DashboardLayout({
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const gamification = gamificationResult.data as any as UserGamification | null
 
+  if (profile && !profile.onboarding_completed) {
+    redirect("/onboarding")
+  }
+
   return (
     <div className="min-h-screen bg-gray-50">
       <TopBar profile={profile} gamification={gamification} />

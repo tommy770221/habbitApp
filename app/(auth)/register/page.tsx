@@ -67,7 +67,7 @@ export default function RegisterPage() {
           has_hypertension: hasHypertension,
           has_diabetes: hasDiabetes,
           has_hyperlipidemia: hasHyperlipidemia,
-          onboarding_completed: true,
+          onboarding_completed: false,
         })
         .eq("id", data.user.id)
 
@@ -76,7 +76,7 @@ export default function RegisterPage() {
       }
     }
 
-    router.push("/")
+    router.push("/onboarding")
     router.refresh()
   }
 
