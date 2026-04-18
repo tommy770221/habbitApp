@@ -1,7 +1,7 @@
 "use client"
 
-import { useState } from "react"
-import { useRouter } from "next/navigation"
+import { useState, useEffect } from "react"
+import { useRouter, useSearchParams } from "next/navigation"
 import Link from "next/link"
 import { createClient } from "@/lib/supabase/client"
 import { Button } from "@/components/ui/button"
@@ -12,12 +12,27 @@ import { Separator } from "@/components/ui/separator"
 
 export default function LoginPage() {
   const router = useRouter()
+  const searchParams = useSearchParams()
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  async function handleEmailLogin(e: React.FormEvent) {
+  useEffect(() => {
+    const code = searchParams.get("code")
+    if (!code) return
+    const supabase = createClient()
+    supabase.auth.exchangeCodeForSession(code).then(({ error }) => {
+      if (error) {
+        setError("確認連結無效或已過期，請重新嘗試")
+      } else {
+        router.push("/")
+        router.refresh()
+      }
+    })
+  }, [searchParams, router])
+
+  async function handleEmailLogin(e: React.SubmitEvent) {
     e.preventDefault()
     setLoading(true)
     setError(null)
