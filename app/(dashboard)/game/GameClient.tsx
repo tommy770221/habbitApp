@@ -2,9 +2,10 @@
 
 import { useState, useRef } from "react"
 import { useRouter } from "next/navigation"
+import Link from "next/link"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Zap, Swords, Shield, LogOut, Trophy, Star } from "lucide-react"
+import { Zap, Swords, Shield, LogOut, Trophy, Star, BookOpen, ChevronRight } from "lucide-react"
 import type { Monster, UserCharacter } from "@/types"
 
 type Screen = "select" | "ready" | "battle" | "result"
@@ -221,6 +222,19 @@ export function GameClient({ initialEnergy, initialStage, totalDefeated, charact
             <span>{energy} / 100</span>
           </div>
         </div>
+
+        <Link href="/game/tutorial">
+          <div className="bg-gradient-to-r from-purple-600 to-indigo-600 rounded-xl p-3.5 flex items-center justify-between text-white shadow-md">
+            <div className="flex items-center gap-3">
+              <BookOpen className="w-5 h-5 shrink-0" />
+              <div>
+                <p className="font-semibold text-sm">遊戲教學</p>
+                <p className="text-xs opacity-80">新手必看！了解角色、能量與戰鬥規則</p>
+              </div>
+            </div>
+            <ChevronRight className="w-5 h-5 opacity-70 shrink-0" />
+          </div>
+        </Link>
 
         <div className="bg-gradient-to-r from-purple-50 to-blue-50 rounded-xl p-3 flex items-center justify-between">
           <div>
