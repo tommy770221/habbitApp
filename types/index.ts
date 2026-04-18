@@ -16,6 +16,7 @@ export interface Profile {
   target_ldl: number | null
   target_hdl: number | null
   target_triglycerides: number | null
+  onboarding_completed: boolean
   created_at: string
   updated_at: string
 }
