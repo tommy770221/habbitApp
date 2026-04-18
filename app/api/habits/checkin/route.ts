@@ -2,6 +2,7 @@ import { createClient } from "@/lib/supabase/server"
 import { NextResponse } from "next/server"
 import { z } from "zod"
 import { toLocaleDateString } from "@/lib/utils"
+import { checkAndAwardBadges } from "@/lib/gamification/awards"
 
 const dietSchema = z.object({
   habit_type: z.literal("diet"),
@@ -116,6 +117,8 @@ export async function POST(request: Request) {
     p_description: habitLabels[habit_type],
   })
 
+  const { awarded: badges, xp_total: badge_xp } = await checkAndAwardBadges(supabase, user.id)
+
   return NextResponse.json({
     checkin,
     xp_awarded: xpAmount,
@@ -123,6 +126,8 @@ export async function POST(request: Request) {
     streak_xp: streakResult?.streak_xp ?? 0,
     level_up: xpResult?.leveled_up ?? false,
     new_level: xpResult?.new_level,
+    badges_awarded: badges,
+    badge_xp,
   })
 }
 

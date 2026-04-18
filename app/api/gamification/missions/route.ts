@@ -1,5 +1,6 @@
 import { createClient } from "@/lib/supabase/server"
 import { NextResponse } from "next/server"
+import { checkAndAwardBadges } from "@/lib/gamification/awards"
 
 // POST: claim XP for completed mission
 export async function POST(request: Request) {
@@ -43,5 +44,12 @@ export async function POST(request: Request) {
     p_description: "任務完成獎勵",
   })
 
-  return NextResponse.json({ xp_awarded: xpReward, level_up: xpResult?.leveled_up ?? false })
+  const { awarded: badges, xp_total: badge_xp } = await checkAndAwardBadges(supabase, user.id)
+
+  return NextResponse.json({
+    xp_awarded: xpReward,
+    level_up: xpResult?.leveled_up ?? false,
+    badges_awarded: badges,
+    badge_xp,
+  })
 }

@@ -1,6 +1,7 @@
 import { createClient } from "@/lib/supabase/server"
 import { NextResponse } from "next/server"
 import { bloodPressureSchema, bloodSugarSchema, bloodLipidsSchema } from "@/lib/validators/metrics"
+import { checkAndAwardBadges } from "@/lib/gamification/awards"
 
 const XP_BY_METRIC: Record<string, number> = {
   blood_pressure: 20,
@@ -69,11 +70,15 @@ export async function POST(request: Request) {
     p_description: metricLabels[metric_type],
   })
 
+  const { awarded: badges, xp_total: badge_xp } = await checkAndAwardBadges(supabase, user.id)
+
   return NextResponse.json({
     metric,
     xp_awarded: xpAmount,
     level_up: xpResult?.leveled_up ?? false,
     new_level: xpResult?.new_level,
+    badges_awarded: badges,
+    badge_xp,
   })
 }
 
