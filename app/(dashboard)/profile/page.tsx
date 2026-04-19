@@ -70,7 +70,7 @@ export default async function ProfilePage() {
             </Avatar>
             <div>
               <h2 className="text-xl font-bold">{profile.display_name}</h2>
-              <p className="text-white/80 text-sm">{user.email}</p>
+              <p className="text-white/80 text-sm">{user.email ?? (user.is_anonymous ? "訪客帳號" : "")}</p>
               {conditions.length > 0 && (
                 <div className="flex gap-1 mt-1">
                   {conditions.map((c) => (

@@ -63,6 +63,33 @@ function LoginForm() {
     }
   }
 
+  async function handleAnonymousLogin() {
+    setLoading(true)
+    setError(null)
+    const supabase = createClient()
+
+    const { data, error: signInError } = await supabase.auth.signInAnonymously()
+
+    if (signInError || !data.user) {
+      setError("匿名登入失敗，請稍後再試")
+      setLoading(false)
+      return
+    }
+
+    // Use a server-side API route so the profile upsert runs with a properly
+    // authenticated server client (avoids apikey header issues with SSR cookies)
+    const res = await fetch("/api/auth/anonymous-setup", { method: "POST" })
+    if (!res.ok) {
+      await supabase.auth.signOut()
+      setError("初始化設定失敗，請稍後再試")
+      setLoading(false)
+      return
+    }
+
+    router.push("/")
+    router.refresh()
+  }
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-green-50 to-teal-50 p-4">
       <div className="w-full max-w-md">
@@ -136,6 +163,24 @@ function LoginForm() {
                 <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
               </svg>
               使用 Google 登入
+            </Button>
+
+            <div className="relative">
+              <div className="absolute inset-0 flex items-center">
+                <Separator />
+              </div>
+              <div className="relative flex justify-center text-xs uppercase">
+                <span className="bg-white px-2 text-gray-500">或</span>
+              </div>
+            </div>
+
+            <Button
+              variant="outline"
+              className="w-full border-dashed text-gray-500 hover:text-gray-700 hover:bg-gray-50"
+              onClick={handleAnonymousLogin}
+              disabled={loading}
+            >
+              👤 匿名登入（不需帳號）
             </Button>
 
             <p className="text-center text-sm text-gray-600">
