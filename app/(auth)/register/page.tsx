@@ -14,6 +14,7 @@ export default function RegisterPage() {
   const [step, setStep] = useState<1 | 2>(1)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [pendingConfirm, setPendingConfirm] = useState(false)
 
   // Step 1 fields
   const [displayName, setDisplayName] = useState("")
@@ -43,22 +44,59 @@ export default function RegisterPage() {
     setError(null)
     const supabase = createClient()
 
-    const { data, error: signUpError } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        data: { full_name: displayName },
-      },
-    })
+    const { data: { user: currentUser } } = await supabase.auth.getUser()
+    const isAnonymous = currentUser?.is_anonymous === true
 
-    if (signUpError) {
-      setError(signUpError.message)
+    let userId: string | undefined
+
+    if (isAnonymous) {
+      // Convert anonymous account to permanent — preserves existing data
+      const { data, error: updateError } = await supabase.auth.updateUser({
+        email,
+        password,
+        data: { full_name: displayName },
+      })
+      if (updateError) {
+        setError(updateError.message)
+        setLoading(false)
+        return
+      }
+      userId = data.user?.id
+
+      // Update profile first, then sign out — Supabase "Secure email change"
+      // keeps email pending until confirmed, so we can't stay logged in yet
+      if (userId) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        await (supabase as any)
+          .from("profiles")
+          .update({
+            display_name: displayName,
+            has_hypertension: hasHypertension,
+            has_diabetes: hasDiabetes,
+            has_hyperlipidemia: hasHyperlipidemia,
+            onboarding_completed: false,
+          })
+          .eq("id", userId)
+      }
+      await supabase.auth.signOut()
+      setPendingConfirm(true)
       setLoading(false)
       return
+    } else {
+      const { data, error: signUpError } = await supabase.auth.signUp({
+        email,
+        password,
+        options: { data: { full_name: displayName } },
+      })
+      if (signUpError) {
+        setError(signUpError.message)
+        setLoading(false)
+        return
+      }
+      userId = data.user?.id
     }
 
-    if (data.user) {
-      // Update profile with health conditions
+    if (userId) {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const { error: profileError } = await (supabase as any)
         .from("profiles")
@@ -69,7 +107,7 @@ export default function RegisterPage() {
           has_hyperlipidemia: hasHyperlipidemia,
           onboarding_completed: false,
         })
-        .eq("id", data.user.id)
+        .eq("id", userId)
 
       if (profileError) {
         console.error("Profile update error:", profileError)
@@ -106,6 +144,30 @@ export default function RegisterPage() {
       onChange: setHasHyperlipidemia,
     },
   ]
+
+  if (pendingConfirm) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-green-50 to-teal-50 p-4">
+        <div className="w-full max-w-md text-center">
+          <div className="text-5xl mb-4">📧</div>
+          <h1 className="text-2xl font-bold text-gray-900 mb-2">請確認電子郵件</h1>
+          <p className="text-gray-600 mb-1">
+            已將確認信寄至
+          </p>
+          <p className="font-medium text-gray-900 mb-4">{email}</p>
+          <p className="text-gray-500 text-sm mb-6">
+            點擊信中連結後，即可使用新帳號登入。您先前的訪客資料已保留。
+          </p>
+          <Link
+            href="/login"
+            className="inline-block bg-green-600 text-white px-6 py-2 rounded-lg font-medium hover:bg-green-700"
+          >
+            前往登入
+          </Link>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-green-50 to-teal-50 p-4">
