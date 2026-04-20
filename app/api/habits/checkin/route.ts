@@ -129,18 +129,23 @@ export async function POST(request: Request) {
   if (habitChar) {
     const { data: uc } = await supabase
       .from("user_characters")
-      .select("id, unlock_progress, is_unlocked")
+      .select("unlock_progress, is_unlocked")
       .eq("user_id", user.id)
       .eq("character_id", habitChar.id)
       .maybeSingle()
-    if (uc && !uc.is_unlocked) {
-      const newProgress = uc.unlock_progress + 1
+    if (!uc?.is_unlocked) {
+      const newProgress = (uc?.unlock_progress ?? 0) + 1
       const nowUnlocked = newProgress >= habitChar.unlock_count
-      await supabase.from("user_characters").update({
-        unlock_progress: newProgress,
-        is_unlocked: nowUnlocked,
-        unlocked_at: nowUnlocked ? new Date().toISOString() : null,
-      }).eq("id", uc.id)
+      await supabase.from("user_characters").upsert(
+        {
+          user_id: user.id,
+          character_id: habitChar.id,
+          unlock_progress: newProgress,
+          is_unlocked: nowUnlocked,
+          unlocked_at: nowUnlocked ? new Date().toISOString() : null,
+        },
+        { onConflict: "user_id,character_id" }
+      )
     }
   }
 
